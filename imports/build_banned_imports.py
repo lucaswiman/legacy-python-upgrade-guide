@@ -73,7 +73,7 @@ for row in rows:
                 raise
     banned_import = '.'.join(import_parts)
     REMOVALS_AND_RENAMES.append(
-        [banned_import, 'six.moves.{six_moves_name}'.format(**locals())]
+        [banned_import, 'six.moves.{six_moves_name}'.format(**locals()), True]
     )
 
 
@@ -169,7 +169,7 @@ for six_module, moves in urllib_moves:
         exec('from {module} import {name}'.format(module=''.join(moved_from.split('.')[:-1]), name=name))  # Verify the original move actually exists
         exec('from {six_module} import {name}'.format(**locals()))  # Verify the import can be executed.
         moved_to = '{six_module}.{name}'.format(**locals())
-        REMOVALS_AND_RENAMES.append([moved_from, moved_to])
+        REMOVALS_AND_RENAMES.append([moved_from, moved_to, True])
 
 
 # Now add the urllib2 and urlparse deprecations
@@ -187,8 +187,6 @@ REMOVALS_AND_RENAMES.extend([
     'cl',
         # Documented as obsolete since Python 2.0 or earlier.
         # Interface to SGI hardware.
-    ['md5', 'hashlib.md5'],
-        # Supplanted by the hashlib module.
     ['mimetools', 'email'],
         # Documented as obsolete in a previous version.
         # Supplanted by the email package.
@@ -202,8 +200,14 @@ REMOVALS_AND_RENAMES.extend([
         # Locking is better done by fcntl.lockf() .
     ['rfc822', 'email'],
         # Supplanted by the email package.
-    ['sha', 'hashlib.sha1'],
+    ['sha.new', 'hashlib.sha1', True],
+    ['sha.sha', 'hashlib.sha1', True],
+    ['sha', 'hashlib'],
         # Supplanted by the hashlib package.
+    ['md5', 'hashlib', True],
+    ['md5.md5', 'hashlib.md5', True],
+    ['md5.new', 'hashlib.md5', True],
+        # Supplanted by the hashlib module.
     'sv',
         # Documented as obsolete since Python 2.0 or earlier.
         # Interface to obsolete SGI Indigo hardware.
@@ -346,18 +350,29 @@ REMOVALS_AND_RENAMES.extend([
     # ['HTMLParser', 'html.parser'],
     # ['BaseHTTPServer', 'http.server'],
 
-    ['UserDict', 'dict or collections.UserDict'],
+    ['UserDict', 'Subclass dict directly or use collections.UserDict/collections.MutableMapping'],
+    ['UserDict.UserDict', 'collections.UserDict', True],
         # Not as useful since types can be a superclass.
         # Useful bits moved to the 'collections' module.
 
-    ['UserList', 'list or collections.UserList'],
+    ['UserList', 'Subclass list directly or use collections.UserList/collections.MutableSequence'],
+    ['UserList.UserList', 'collections.UserList', True],
+
+    ['UserString.UserString', 'collections.UserString', True],
     ['UserString', 'six.text_type, six.binary_type or collections.UserString'],
         # Not useful since types can be a superclass.
         # Moved to the 'collections' module.
 
     # https://www.python.org/dev/peps/pep-3108/#modules-to-rename
-    ['ConfigParser', 'Use the six.moves.configparser or the backport https://pypi.python.org/pypi/configparser'],
-    ['cStringIO', 'io.BytesIO'],
+    ['ConfigParser', 'six.moves.configparser', True],
+
+    # These aren't _completely_ compatible, but can be substituted in almost all cases.
+    # The only difference is that cStringIO implicitly calls `.encode('ascii')`, while
+    # io.BytesIO does not. Both will fail if fed unicode that cannot be directly encoded
+    # to ascii.
+    ['cStringIO.cStringIO', 'io.BytesIO', True],
+
+    ['cStringIO', 'io', True],
     ['StringIO', 'io.StringIO or io.BytesIO'],
 
     # These moves are not included in six.moves, though they can be added manually if needed.
@@ -370,12 +385,13 @@ REMOVALS_AND_RENAMES.extend([
 
 REMOVALS_AND_RENAMES.extend([
     # Misc holes not mentioned in the PEP or six docs.
-    ['string.atof', 'float'],
-    ['string.atoi', 'int'],
-    ['string.atol', 'int'],
-    ['string.letters', 'string.ascii_letters'],
-    ['string.lowercase', 'string.ascii_lowercase'],
-    ['string.uppercase', 'string.ascii_uppercase'],
+    ['anydbm', 'dbm', True],
+    ['string.atof', 'float', True],
+    ['string.atoi', 'int', True],
+    ['string.atol', 'int', True],
+    ['string.letters', 'string.ascii_letters', True],
+    ['string.lowercase', 'string.ascii_lowercase', True],
+    ['string.uppercase', 'string.ascii_uppercase', True],
     'string.capitalize',
     'string.center',
     'string.count',
@@ -414,12 +430,12 @@ REMOVALS_AND_RENAMES.extend([
     'platform._mac_ver_lookup',
     'platform._mac_ver_gstalt',
     'platform._bcd2str',
-    ['tarfile.S_IFDIR', 'stat.S_IFDIR'],
-    ['tarfile.S_IFCHR', 'stat.S_IFCHR'],
-    ['tarfile.S_IFBLK', 'stat.S_IFBLK'],
-    ['tarfile.S_IFLNK', 'stat.S_IFLNK'],
-    ['tarfile.S_IFREG', 'stat.S_IFREG'],
-    ['tarfile.S_IFIFO', 'stat.S_IFIFO'],
+    ['tarfile.S_IFDIR', 'stat.S_IFDIR', True],
+    ['tarfile.S_IFCHR', 'stat.S_IFCHR', True],
+    ['tarfile.S_IFBLK', 'stat.S_IFBLK', True],
+    ['tarfile.S_IFLNK', 'stat.S_IFLNK', True],
+    ['tarfile.S_IFREG', 'stat.S_IFREG', True],
+    ['tarfile.S_IFIFO', 'stat.S_IFIFO', True],
 
     # removed in python 3.5
     'ftplib.Netrc',
