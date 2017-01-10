@@ -290,8 +290,9 @@ REMOVALS_AND_RENAMES.extend([
     'fpformat',
         # All functionality is supported by string interpolation.
 
-    ['htmllib', 'HTMLParser'],
+    ['htmllib', 'six.moves.html_parser'],
         # Superseded by HTMLParser.
+        # HTMLParser was moved later on and has a six move, though not an exact replacement.
 
     'ihooks',
         # Undocumented.
@@ -350,15 +351,13 @@ REMOVALS_AND_RENAMES.extend([
     # ['HTMLParser', 'html.parser'],
     # ['BaseHTTPServer', 'http.server'],
 
-    ['UserDict', 'Subclass dict directly or use collections.UserDict/collections.MutableMapping'],
-    ['UserDict.UserDict', 'collections.UserDict', True],
+    ['UserDict', 'dict or collections.UserDict/collections.MutableMapping'],
         # Not as useful since types can be a superclass.
         # Useful bits moved to the 'collections' module.
+    ['UserDict.UserDictMixin', 'collections.MutableMapping'],
 
-    ['UserList', 'Subclass list directly or use collections.UserList/collections.MutableSequence'],
-    ['UserList.UserList', 'collections.UserList', True],
+    ['UserList', 'list or collections.UserList/collections.MutableSequence'],
 
-    ['UserString.UserString', 'collections.UserString', True],
     ['UserString', 'six.text_type, six.binary_type or collections.UserString'],
         # Not useful since types can be a superclass.
         # Moved to the 'collections' module.
@@ -458,9 +457,13 @@ for removal_or_rename in REMOVALS_AND_RENAMES:
     if isinstance(removal_or_rename, basestring):
         banned_import = removal_or_rename
         output.write('    {banned_import} = {banned_import} is removed in Python 3.\n'.format(**locals()))
-    else:
+    elif len(removal_or_rename) == 2:
         moved_from, moved_to = removal_or_rename
         output.write('    {moved_from} = {moved_from} is moved in Python 3. Use {moved_to} instead\n'.format(**locals()))
+    else:
+        moved_from, moved_to, exact = removal_or_rename
+        assert exact is True
+        output.write('    {moved_from} = {moved_from} is moved in Python3. {moved_to} can be used as a drop-in replacement.\n'.format(**locals()))
 
 
 print output.getvalue()
