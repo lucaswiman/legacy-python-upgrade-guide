@@ -443,6 +443,32 @@ REMOVALS_AND_RENAMES.extend([
     ['inspect.getmoduleinfo', 'inspect.getmodulename'],
     'asynchat.fifo',
 
+    ['types.IntType', 'six.integer_types', True],
+    ['types.TypeType', 'six.class_types', True],
+    ['types.BooleanType', 'bool', True],
+    'types.UnboundMethodType',
+    ['types.StringType', 'six.binary_types or six.text_types depdending on context'],
+    ['types.FloatType', 'float', True],
+    'types.DictionaryType',
+    'types.NotImplementedType',
+    'types.DictProxyType',
+    ['types.StringTypes', 'six.string_types', True],
+    'types.InstanceType',
+    'types.SliceType',
+    ['types.DictType', 'dict', True],
+    'FileType',
+    ['EllipsisType', 'type(Ellipsis)', True],
+    ['ListType', 'list', True],
+    ['TupleType', 'tuple', True],
+    'LongType',
+    'BufferType',
+    'ClassType',
+    ['UnicodeType', 'six.text_type', True],
+    ['ComplexType', 'complex', True],
+    'ObjectType',
+    'XRangeType',
+    ['NoneType', 'type(None)', True],
+
 ])
 
 def sort_key(removal_or_rename):
