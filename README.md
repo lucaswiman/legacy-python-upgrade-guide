@@ -1,5 +1,7 @@
 # Upgrading Legacy Python Systems to Python 3
 
+*Note (2021)*: This is an incomplete draft I wrote in 2016.
+
 This document assumes you have a large codebase which you want to upgrade from Python 2 to a modern version of Python. It's highly opinionated, and intends to give _a_ way of upgrading that will be effective for many codebases.
 
 ## Prerequisites
